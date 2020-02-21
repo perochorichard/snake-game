@@ -1,15 +1,22 @@
-window.onload = function () {
-    let grid = $('#grid');
+import Snake from './snake.js';
+import Position from './position.js';
 
+window.onload = function () {
     let width = window.innerWidth;
     let height = window.innerHeight;
+    let s = new Snake(21);
 
     let dimension = width < height ? width : height;
     dimension -= dimension * 0.3;
-    $('#grid').append(this.createGrid(dimension, 21));
+    $('#grid').append(createGrid(dimension, 21));
 
-    $('#animate').on('click', function () {
-        animate();
+    $('#move').on('click', function () {
+        
+        s.move(new Position(0, 1));
+    });
+    $('#grow').on('click', function () {
+        
+        s.grow(new Position(0, 1));
     });
 }
 
@@ -35,16 +42,24 @@ function createGrid(dimension, count) {
     return tbody;
 }
 
-async function animate() {
-    $('#5_6').css({
+async function animate(id) {
+    let intime = 100;
+    let outtime = 1000;
+    let unit = $('#' + id);
+    let originalColor = unit.css('background-color');
+    unit.css({
         "transform": "scale(1.2)",
-        "transition": "0.5s",
+        "transition": intime + 'ms',
         "background-color": "#54e375"
     });
-    await new Promise(resolve => setTimeout(resolve, 500));
-    $('#5_6').css({
+    await sleep(intime);
+    unit.css({
         "transform": "scale(1)",
-        "transition": "3s",
-        "background-color": "#5e5e5e"
+        "transition": outtime + 'ms',
+        "background-color": originalColor
     });
+}
+
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
