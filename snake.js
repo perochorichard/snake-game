@@ -1,7 +1,6 @@
 import Position from './position.js';
 export default class Snake {
-    constructor(dimensions) {
-        this.dimensions = dimensions;
+    constructor() {
         this.head = new Position(0, 0);
         this.body = [JSON.parse(JSON.stringify(this.head))];
         console.log(this.body);

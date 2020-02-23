@@ -1,23 +1,69 @@
 import Snake from './snake.js';
 import Position from './position.js';
-
+let dir = new Position(1, 0);
 window.onload = function () {
     let width = window.innerWidth;
     let height = window.innerHeight;
-    let s = new Snake(21);
+    let s = new Snake();
 
     let dimension = width < height ? width : height;
     dimension -= dimension * 0.3;
     $('#grid').append(createGrid(dimension, 21));
 
     $('#move').on('click', function () {
-        
-        s.move(new Position(0, 1));
+        playGame();
     });
+
     $('#grow').on('click', function () {
-        
-        s.grow(new Position(0, 1));
+        clear(s);
+        s.grow(new Position(1, 0));
+        display(s);
     });
+}
+
+$(document).keydown(function (e) {
+    switch (e.which) {
+        case 37: // left
+            dir = new Position(-1, 0);
+            break;
+        case 38: // up
+            dir = new Position(0, -1);
+            break;
+        case 39: // right
+            dir = new Position(1, 0);
+            break;
+        case 40: // down
+            dir = new Position(0, 1);
+            break;
+        default: return;
+    }
+    e.preventDefault();
+})
+
+async function playGame() {
+    let gameEnded = false;
+    let snake = new Snake();
+    let count = 0;
+    while (!gameEnded) {
+        await sleep(500).then(() => {
+            clear(snake);
+            snake.move(dir);
+            display(snake);
+        });
+    }
+}
+
+async function display(snake) {
+    for (let i = 0; i < snake.body.length; i++) {
+        let pos = snake.body[i];
+        $('#' + pos.y + '_' + pos.x).css('background-color', '#54e375');
+    }
+}
+function clear(snake) {
+    for (let i = 0; i < snake.body.length; i++) {
+        let pos = snake.body[i];
+        $('#' + pos.y + '_' + pos.x).css('background-color', '#808080');
+    }
 }
 
 function createGrid(dimension, count) {
@@ -41,18 +87,21 @@ function createGrid(dimension, count) {
 
     return tbody;
 }
-
-async function animate(id) {
-    let intime = 100;
-    let outtime = 1000;
-    let unit = $('#' + id);
-    let originalColor = unit.css('background-color');
+async function animate_in(pos) {
+    let intime = 1000;
+    let unit = $('#' + pos.y + '_' + pos.x);
     unit.css({
         "transform": "scale(1.2)",
         "transition": intime + 'ms',
         "background-color": "#54e375"
     });
     await sleep(intime);
+}
+
+async function animate_out(pos) {
+    let outtime = 1000;
+    let unit = $('#' + pos.y + '_' + pos.x);
+    let originalColor = '#808080';
     unit.css({
         "transform": "scale(1)",
         "transition": outtime + 'ms',
